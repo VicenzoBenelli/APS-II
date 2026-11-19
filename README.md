@@ -162,13 +162,27 @@ Isso facilita manter a consistência visual, trocar uma família inteira e ampli
 
 ## Aplicação dos princípios SOLID
 
-| Princípio | Aplicação objetiva |
+O projeto utiliza os princípios SOLID para organizar as responsabilidades das classes, reduzir o acoplamento e facilitar a manutenção do código. O padrão **Abstract Factory** contribui principalmente para essa organização ao separar a criação dos componentes visuais de sua utilização na interface.
+
+| Princípio | Aplicação no projeto |
 |---|---|
-| **S — Single Responsibility** | `FabricaTemaClaro` e `FabricaTemaEscuro` criam produtos; `BotaoClaro`, `CampoTextoClaro`, `CaixaSelecaoClara` e suas versões escuras fornecem componentes da família. `EstilosComponentes` reúne a montagem visual comum; `SeletorFabrica` concentra a escolha da fábrica; `JanelaPrincipal` cuida da apresentação e das interações. É uma separação adequada ao tamanho acadêmico, sem alegar uma arquitetura MVC completa. |
-| **O — Open/Closed** | Uma nova família pode implementar `FabricaComponentes`, `Botao`, `CampoTexto` e `CaixaSelecao` sem alterar a lógica de `JanelaPrincipal.aplicarTema`. A extensão ainda exige cadastrar o tema em `Tema` e atualizar `SeletorFabrica.para`; o sistema inteiro não é fechado a modificações. |
-| **L — Liskov Substitution** | `FabricaTemaClaro` e `FabricaTemaEscuro` cumprem o contrato de `FabricaComponentes`: ambas entregam os três produtos utilizáveis pela mesma tela. `FabricaComponentesTest` verifica as famílias e suas paletas; os testes gráficos exercitam a troca sem mudar o comportamento do formulário. |
-| **I — Interface Segregation** | `Botao`, `CampoTexto` e `CaixaSelecao` têm um método específico cada. Um produto não precisa implementar operações de outros componentes. `FabricaComponentes` agrupa a criação dos três porque seu cliente precisa da família completa. |
-| **D — Dependency Inversion** | `JanelaPrincipal.aplicarTema` trabalha com `FabricaComponentes`, `Botao`, `CampoTexto` e `CaixaSelecao`, sem importar produtos concretos. O conhecimento das fábricas concretas fica em `SeletorFabrica`; a janela ainda depende de Swing e desse ponto de composição, portanto a inversão se aplica à criação da família visual. |
+| **S — Single Responsibility (Responsabilidade Única)** | Cada classe possui uma responsabilidade definida. `FabricaTemaClaro` e `FabricaTemaEscuro` são responsáveis por criar suas respectivas famílias de produtos. As classes `BotaoClaro`, `CampoTextoClaro`, `CaixaSelecaoClara` e suas equivalentes escuras implementam os componentes visuais de cada tema. `EstilosComponentes` centraliza a estilização compartilhada, `SeletorFabrica` seleciona a fábrica adequada e `JanelaPrincipal` gerencia a interface e as interações com o usuário. |
+| **O — Open/Closed (Aberto/Fechado)** | O sistema permite adicionar novas famílias de componentes sem modificar a lógica principal de `JanelaPrincipal.aplicarTema`. Por exemplo, um tema azul poderia ter sua própria fábrica e seus produtos concretos, implementando as interfaces existentes. Entretanto, seria necessário registrar o novo tema em `Tema` e atualizar `SeletorFabrica`, demonstrando que a aplicação é extensível, mas não totalmente fechada para modificações. |
+| **L — Liskov Substitution (Substituição de Liskov)** | As fábricas `FabricaTemaClaro` e `FabricaTemaEscuro` implementam a interface `FabricaComponentes` e podem ser utilizadas pela mesma lógica da aplicação. Ambas fornecem botão, campo de texto e caixa de seleção, respeitando os contratos estabelecidos. Assim, é possível substituir uma fábrica pela outra sem comprometer o funcionamento do formulário. |
+| **I — Interface Segregation (Segregação de Interfaces)** | Os produtos possuem interfaces específicas: `Botao`, `CampoTexto` e `CaixaSelecao`. Cada interface define apenas o comportamento necessário ao seu componente, evitando que uma classe implemente métodos que não utiliza. Já `FabricaComponentes` reúne os métodos de criação porque sua finalidade é fornecer uma família completa de produtos relacionados. |
+| **D — Dependency Inversion (Inversão de Dependência)** | `JanelaPrincipal.aplicarTema` utiliza as abstrações `FabricaComponentes`, `Botao`, `CampoTexto` e `CaixaSelecao`, em vez de depender diretamente de classes como `BotaoClaro` ou `CampoTextoEscuro`. As implementações concretas são escolhidas por `SeletorFabrica`. Isso permite trocar a família visual sem alterar a lógica que utiliza os componentes, reduzindo o acoplamento entre a interface e suas implementações. |
+
+### Relação entre SOLID e Abstract Factory
+
+O **Abstract Factory** não garante automaticamente a aplicação de todos os princípios SOLID. Entretanto, sua estrutura favorece alguns deles, especialmente:
+
+- **Responsabilidade Única (SRP):** separa a criação dos produtos da lógica que os utiliza.
+- **Aberto/Fechado (OCP):** facilita a inclusão de novas famílias de componentes.
+- **Inversão de Dependência (DIP):** permite que a aplicação utilize interfaces em vez de depender diretamente das implementações concretas.
+
+**Na prática:** quando o usuário alterna entre os temas Claro e Escuro, `JanelaPrincipal` utiliza a fábrica selecionada para criar uma nova família de componentes. A lógica do formulário permanece a mesma, enquanto os produtos concretos e suas características visuais são alterados.
+
+Esse comportamento demonstra como o Abstract Factory pode contribuir para um sistema mais organizado, flexível e com menor acoplamento.
 
 > O padrão não elimina todo uso de `new`: ele **centraliza a criação dos produtos concretos** nas fábricas. A seleção da fábrica concreta é feita em `SeletorFabrica`.
 
